@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>История</h1>
+<form>
+  <input name="q" value="{{q}}" placeholder="Поиск" />
+  <select name="status"><option value="">Все</option><option value="completed">completed</option><option value="processing">processing</option></select>
+  <button>Фильтр</button>
+</form>
+<table><tr><th>ID</th><th>ФИО</th><th>ИНН</th><th>Статус</th><th>Дата</th></tr>
+{% for i in items %}
+<tr><td><a href="/requests/{{i.id}}/report">{{i.id}}</a></td><td>{{i.full_name}}</td><td>{{i.inn}}</td><td>{{i.status}}</td><td>{{i.created_at}}</td></tr>
+{% endfor %}
+</table>
+{% endblock %}

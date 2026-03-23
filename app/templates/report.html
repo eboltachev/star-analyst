@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Справка</h1>
+<pre>{{ report.markdown if report else 'Нет отчёта' }}</pre>
+
+<h2>Прозрачность по источникам</h2>
+<ul>
+  {% for run in source_runs %}
+    <li>
+      <b>{{ run.source_id }}</b>: {{ run.status }}
+      {% if run.message %}<br/><small>{{ run.message }}</small>{% endif %}
+    </li>
+  {% else %}
+    <li>Запусков источников пока нет.</li>
+  {% endfor %}
+</ul>
+{% if source_runs|selectattr('status', 'equalto', 'error')|list %}
+<p><b>Ограничение:</b> часть источников недоступна или требует ручной верификации. Проверьте статусы выше и выполните rerun.</p>
+{% endif %}
+
+<h3>История rerun</h3>
+<ul>
+  {% for rerun in reruns %}
+    <li>#{{ rerun.id }} — {{ rerun.status }} — источники: {{ rerun.source_ids|join(', ') }}</li>
+  {% else %}
+    <li>Дозапусков пока нет.</li>
+  {% endfor %}
+</ul>
+
+<h2>Граф связей</h2>
+<div id="cy" style="height: 320px; border:1px solid #ddd"></div>
+<h2>Дозапуск источников</h2>
+<form method="post" action="/requests/{{item.id}}/rerun">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+  {% for s in sources %}<label><input type="checkbox" name="rerun_sources" value="{{s.id}}" checked /> {{s.name}}</label>{% endfor %}
+  <button type="submit">Дозапустить</button>
+</form>
+<div id="graph-detail" style="border:1px solid #ddd;padding:8px;margin:8px 0">Кликните узел/ребро для деталей</div>
+<h2>Чат</h2>
+<div x-data="chatBox()">
+  <textarea x-model="q"></textarea>
+  <button @click="ask">Спросить</button>
+  <pre x-text="a"></pre>
+</div>
+<script>
+const graph = {{ graph|tojson }};
+const cy=cytoscape({container: document.getElementById('cy'), elements: [...graph.nodes, ...graph.edges], style:[{selector:'node',style:{'label':'data(label)','background-color':'#3b82f6'}},{selector:'edge',style:{'curve-style':'bezier','target-arrow-shape':'triangle','label':'data(type)'}}], layout:{name:'cose'}});
+cy.on('tap','node,edge', (evt)=>{ const d=evt.target.data(); const ev=(d.evidence||[]).map(e=>`<a href="#evidence-${e}">evidence:${e}</a>`).join(', '); document.getElementById('graph-detail').innerHTML=`<b>${d.label||d.id}</b><br/>${d.description||''}<br/>Evidence: ${ev||'n/a'}`; });
+function chatBox(){ return {q:'',a:'', async ask(){ const fd=new FormData(); fd.append('question', this.q); fd.append('csrf_token','{{ csrf_token }}'); const r= await fetch('/requests/{{item.id}}/chat',{method:'POST',body:fd}); this.a=(await r.json()).answer; }} }
+</script>
+{% endblock %}

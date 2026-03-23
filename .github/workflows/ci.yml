@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: ["main", "master", "work"]
+
+jobs:
+  baseline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -e .[dev]
+      - run: pytest tests/unit tests/integration tests/e2e
+
+  adapter-runtime-mocks:
+    runs-on: ubuntu-latest
+    needs: baseline
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -e .[dev]
+      - run: scripts/test_adapter_runtime_mocks.sh
+
+  integration-postgres:
+    runs-on: ubuntu-latest
+    needs: baseline
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_DB: app
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: app
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd="pg_isready -U app -d app"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -e .[dev]
+      - run: scripts/test_integration_postgres.sh
+
+  e2e-full:
+    runs-on: ubuntu-latest
+    needs: baseline
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -e .[dev]
+      - run: python -m playwright install --with-deps chromium
+      - run: scripts/test_e2e_full.sh

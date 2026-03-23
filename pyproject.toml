@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "star-analyst"
+version = "0.1.0"
+description = "Compact OSINT verification MVP"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi==0.116.1",
+  "uvicorn[standard]==0.35.0",
+  "sqlalchemy==2.0.43",
+  "alembic==1.16.4",
+  "psycopg[binary]==3.2.9",
+  "pgvector==0.3.3",
+  "jinja2==3.1.6",
+  "python-multipart==0.0.20",
+  "pydantic==2.11.7",
+  "pydantic-settings==2.10.1",
+  "httpx==0.28.1",
+  "passlib[bcrypt]==1.7.4",
+  "itsdangerous==2.2.0",
+  "pyyaml==6.0.2",
+  "structlog==25.4.0",
+  "orjson==3.11.2",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest==8.4.1",
+  "pytest-asyncio==1.1.0",
+  "pytest-cov==6.2.1",
+  "respx==0.22.0",
+  "playwright==1.54.0",
+]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+markers = [
+  "e2e: End-to-end tests",
+]
+
+[tool.setuptools]
+packages = ["app"]

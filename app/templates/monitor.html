@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Мониторинг {{ request_id }}</h1>
+<ul id="events"></ul>
+<a href="/requests/{{request_id}}/report">Открыть справку</a>
+<script>
+const ul = document.getElementById('events');
+const es = new EventSource('/requests/{{request_id}}/events');
+es.onmessage = (ev) => {
+  const data = JSON.parse(ev.data);
+  const li = document.createElement('li');
+  li.textContent = `${data.step} — ${data.status}`;
+  ul.appendChild(li);
+};
+</script>
+{% endblock %}
