@@ -1,0 +1,9 @@
+<!doctype html><html><body>
+<h1>Login</h1>
+<form method="post" action="/login">
+  <input name="email" placeholder="email" value="admin@example.com" />
+  <input name="password" type="password" value="admin123" />
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}" /><button type="submit">Войти</button>
+</form>
+<p>Создать админа: POST /seed-admin</p>
+</body></html>

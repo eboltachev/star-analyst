@@ -1,0 +1,25 @@
+sources:
+  - id: fns_registry
+    name: Открытые реестры ФНС
+    enabled: true
+    adapter: FnsRegistryAdapter
+    base_url: https://egrul.nalog.ru
+    timeout: 15
+    rate_limit: 1.0
+    description: Поиск по открытым данным ФНС
+  - id: sudrf
+    name: ГАС / суды общей юрисдикции
+    enabled: true
+    adapter: SudrfAdapter
+    base_url: https://sudrf.ru
+    timeout: 20
+    rate_limit: 0.5
+    description: Судебные упоминания
+  - id: mvd_wanted
+    name: МВД Внимание, розыск!
+    enabled: true
+    adapter: MvdWantedAdapter
+    base_url: https://мвд.рф/wanted
+    timeout: 20
+    rate_limit: 0.5
+    description: Публичные карточки розыска

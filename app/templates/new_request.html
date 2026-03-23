@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Новая проверка</h1>
+<form method="post" action="/requests" enctype="multipart/form-data">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+  <label>ФИО <input name="full_name" required /></label>
+  <label>Дата рождения <input name="birth_date" type="date" /></label>
+  <label>ИНН <input name="inn" /></label>
+  <label>Комментарий <textarea name="comment"></textarea></label>
+  <fieldset><legend>Источники</legend>
+    {% for s in sources %}
+      <label><input type="checkbox" name="selected_sources" value="{{s.id}}" checked /> {{ s.name }}</label>
+    {% endfor %}
+  </fieldset>
+  <label>Файлы <input type="file" name="files" multiple /></label>
+  <button type="submit">Запустить проверку</button>
+</form>
+{% endblock %}
